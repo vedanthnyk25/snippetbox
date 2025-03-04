@@ -9,10 +9,7 @@ import (
 )
 
 func main() {
-	mux := http.NewServeMux()
-
-	fileServer := http.FileServer(http.Dir("./ui/static"))
-
+	
 	addr := flag.String("addr", ":4000", "http network address")
 
 	flag.Parse()
