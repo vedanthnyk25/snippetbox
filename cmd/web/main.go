@@ -3,11 +3,13 @@ package main
 import (
 	"flag"
 	//"log"
+	"database/sql"
 	"log/slog"
 	"net/http"
 	"os"
-	"database/sql"
-  _ "github.com/go-sql-driver/mysql"
+
+	_ "github.com/go-sql-driver/mysql"
+	"vedanth.snippetbox.net/internal/models"
 )
 
 func main() {
@@ -32,6 +34,7 @@ func main() {
 
 	app := &application{
 		logger: logger,
+		snippets: &models.SnippetModel{DB: db},
 	}
 	logger.Info("Starting server", slog.String("addr", *addr))
 
@@ -55,4 +58,5 @@ func openDB(dsn string) (*sql.DB, error) {
 
 type application struct {
 	logger *slog.Logger
+	snippets *models.SnippetModel
 }
