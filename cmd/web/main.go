@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"html/template"
 
 	_ "github.com/go-sql-driver/mysql"
 	"vedanth.snippetbox.net/internal/models"
@@ -31,10 +32,18 @@ func main() {
     //always close the database connection
 	defer db.Close()
 
+	//initialise template cache
+	templateCache, err:= newTemplateCache()
+	if err!=nil{
+		logger.Error(err.Error())
+		os.Exit(1)
+	}
+
 
 	app := &application{
 		logger: logger,
 		snippets: &models.SnippetModel{DB: db},
+		templateCache: templateCache,
 	}
 	logger.Info("Starting server", slog.String("addr", *addr))
 
@@ -59,4 +68,5 @@ func openDB(dsn string) (*sql.DB, error) {
 type application struct {
 	logger *slog.Logger
 	snippets *models.SnippetModel
+	templateCache map[string]*template.Template
 }
