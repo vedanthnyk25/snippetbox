@@ -3,19 +3,19 @@ package main
 import (
 	"flag"
 	//"log"
+	"crypto/tls"
 	"database/sql"
 	"html/template"
 	"log/slog"
 	"net/http"
-	"time"
 	"os"
+	"time"
 
-
+	"github.com/alexedwards/scs/mysqlstore" // New import
+	"github.com/alexedwards/scs/v2"
 	"github.com/go-playground/form/v4"
 	_ "github.com/go-sql-driver/mysql"
 	"vedanth.snippetbox.net/internal/models"
-	"github.com/alexedwards/scs/mysqlstore" // New import
-    "github.com/alexedwards/scs/v2"
 )
 
 func main() {
@@ -49,6 +49,15 @@ func main() {
 	sessionManager.Store = mysqlstore.New(db)
 	sessionManager.Lifetime = 12 * time.Hour
 
+	sessionManager.Cookie.Secure= true
+
+	tlsConfig:= &tls.Config{
+		CurvePreferences: []tls.CurveID{
+			tls.X25519,
+			tls.CurveP256,
+		},
+	}
+
 	app := &application{
 		logger: logger,
 		snippets: &models.SnippetModel{DB: db},
@@ -56,9 +65,19 @@ func main() {
 		formDecoder: formDecoder,
 		sessionManager: sessionManager,
 	}
-	logger.Info("Starting server", slog.String("addr", *addr))
+    srv:= &http.Server{
+		Addr: *addr,
+		Handler: app.routes(),
+		ErrorLog: slog.NewLogLogger(logger.Handler(), slog.LevelError),
+		TLSConfig: tlsConfig,
 
-	err = http.ListenAndServe(*addr, app.routes())
+		IdleTimeout: time.Minute,
+		ReadTimeout: 5 * time.Second,
+		WriteTimeout: 10 * time.Second,
+	}
+
+	logger.Info("Starting server on", "port",  srv.Addr)
+	err= srv.ListenAndServeTLS("./tls/localhost.pem", "./tls/localhost-key.pem")
 	logger.Error(err.Error())
 	os.Exit(1)
 }
