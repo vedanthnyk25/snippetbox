@@ -18,6 +18,7 @@ type snippetCreateForm struct{
     Expires     int    `form:"expires"`
     validator.Validator `form:"-"`
 }
+
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 
     snippets, err:= app.snippets.Latest()
@@ -97,3 +98,36 @@ func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request
 
     http.Redirect(w, r, fmt.Sprintf("/snippet/view/%d", id), http.StatusSeeOther)
 }
+
+//User authentication:
+
+type userSignupForm struct {
+    Name string `form:"name"`
+    Email string `form:"email"`
+    Password string `form:"password"`
+    validator.Validator `form:"-"`
+    }
+
+func (app *application) userSignup(w http.ResponseWriter, r *http.Request) {
+    data:= app.newTemplateData(r)
+    data.Form= userSignupForm{}
+
+    app.render(w, r, http.StatusOK, "signup.tmpl", data)
+}
+
+func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
+    fmt.Println("Create user")
+}
+
+func (app *application) userLogin(w http.ResponseWriter, r *http.Request) {
+    fmt.Println("Login")
+}
+
+func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
+    fmt.Println("Authenticate user and log them in")
+}
+
+func (app *application) userLogoutPost(w http.ResponseWriter, r *http.Request) {
+    fmt.Println("Log the user out")
+}
+
