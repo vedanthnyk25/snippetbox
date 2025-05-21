@@ -68,7 +68,7 @@ func (app *application) snippetCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request) {
-     
+    
     var form snippetCreateForm
 
     err:= app.decodePostForm(r, &form)
@@ -100,7 +100,6 @@ func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request
 }
 
 //User authentication:
-
 type userSignupForm struct {
     Name string `form:"name"`
     Email string `form:"email"`
