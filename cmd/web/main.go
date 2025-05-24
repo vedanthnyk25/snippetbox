@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"time"
+	"fmt"
 
 	"github.com/alexedwards/scs/mysqlstore" // New import
 	"github.com/alexedwards/scs/v2"
@@ -22,7 +23,14 @@ func main() {
 	
 	addr := flag.String("addr", ":4000", "http network address")
     
-    dsn:= flag.String("dsn", "web:vedanthN@25@/snippetbox?parseTime=true", "MySQL data source name")
+  dsn := flag.String("dsn", fmt.Sprintf(
+    "%s:%s@tcp(%s:%s)/%s?parseTime=true",
+    os.Getenv("DB_USER"),
+    os.Getenv("DB_PASS"),
+    os.Getenv("DB_HOST"),
+    os.Getenv("DB_PORT"),
+    os.Getenv("DB_NAME"),
+), "MySQL data source name")
 
 	flag.Parse()
 
